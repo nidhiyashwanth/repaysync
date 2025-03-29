@@ -1,0 +1,132 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$eG7xBnKa0aJQPdlMlmvC1e$DlJZyV/k8Y62znhgz9uEKZxn5mFFAWr3xFMsLjYgD9A=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "Admin",
+      "last_name": "User",
+      "email": "admin@repaysync.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-03-29T00:00:00Z",
+      "phone": "+1234567890",
+      "role": "SUPER_MANAGER",
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$eG7xBnKa0aJQPdlMlmvC1e$DlJZyV/k8Y62znhgz9uEKZxn5mFFAWr3xFMsLjYgD9A=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "manager1",
+      "first_name": "John",
+      "last_name": "Manager",
+      "email": "john.manager@repaysync.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-03-29T00:00:00Z",
+      "phone": "+1234567891",
+      "role": "MANAGER",
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$eG7xBnKa0aJQPdlMlmvC1e$DlJZyV/k8Y62znhgz9uEKZxn5mFFAWr3xFMsLjYgD9A=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "officer1",
+      "first_name": "Sarah",
+      "last_name": "Officer",
+      "email": "sarah.officer@repaysync.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-03-29T00:00:00Z",
+      "phone": "+1234567892",
+      "role": "COLLECTION_OFFICER",
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$eG7xBnKa0aJQPdlMlmvC1e$DlJZyV/k8Y62znhgz9uEKZxn5mFFAWr3xFMsLjYgD9A=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "officer2",
+      "first_name": "Michael",
+      "last_name": "Officer",
+      "email": "michael.officer@repaysync.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-03-29T00:00:00Z",
+      "phone": "+1234567893",
+      "role": "COLLECTION_OFFICER",
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$eG7xBnKa0aJQPdlMlmvC1e$DlJZyV/k8Y62znhgz9uEKZxn5mFFAWr3xFMsLjYgD9A=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "agent1",
+      "first_name": "Lisa",
+      "last_name": "Agent",
+      "email": "lisa.agent@repaysync.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-03-29T00:00:00Z",
+      "phone": "+1234567894",
+      "role": "CALLING_AGENT",
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.hierarchy",
+    "pk": 1,
+    "fields": {
+      "manager": 2,
+      "collection_officer": 3,
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z"
+    }
+  },
+  {
+    "model": "users.hierarchy",
+    "pk": 2,
+    "fields": {
+      "manager": 2,
+      "collection_officer": 4,
+      "created_at": "2024-03-29T00:00:00Z",
+      "updated_at": "2024-03-29T00:00:00Z"
+    }
+  }
+] 
