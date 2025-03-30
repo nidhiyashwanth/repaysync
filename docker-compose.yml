@@ -5,7 +5,6 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -15,7 +14,8 @@ services:
       - DATABASE_URL=postgresql://repaysync:repaysync098@db:5432/repaysync
       - SECRET_KEY=django-insecure-dev-only-key-replace-in-production
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   db:
@@ -28,6 +28,11 @@ services:
       - POSTGRES_PASSWORD=repaysync098
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U repaysync"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
 volumes:

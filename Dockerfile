@@ -10,6 +10,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
+    postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -20,9 +21,12 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt 
 # Copy project
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p /app/staticfiles /app/media /app/logs
+# Create necessary directories and set permissions
+RUN mkdir -p /app/staticfiles /app/media /app/logs \
+    && touch /app/logs/repaysync.log /app/logs/security.log \
+    && chmod -R 777 /app/logs \
+    && chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["/app/entrypoint.sh"]
