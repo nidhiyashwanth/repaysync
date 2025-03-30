@@ -31,7 +31,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-&8_d3fdx%^s3ox*e(y)j&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'http://20.197.19.36:8000/', 'repaysync.codeindia.tech']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'repaysync.codeindia.tech', '20.197.19.36']
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = ['https://repaysync.codeindia.tech', 'http://repaysync.codeindia.tech']
 
 
 # Application definition
