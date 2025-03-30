@@ -64,3 +64,4 @@ logs/*.log
 media/attachments/
 .cursor
 problem-statement.md
+deployingvenv/
