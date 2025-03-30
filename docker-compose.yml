@@ -3,7 +3,13 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
+    command: >
+      sh -c "find . -path '*/migrations/*.py' -not -name '__init__.py' -delete &&
+             find . -path '*/migrations/__pycache__/*' -delete &&
+             python manage.py makemigrations users customers loans interactions core &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -14,7 +20,29 @@ services:
       - SECRET_KEY=django-insecure-dev-only-key-replace-in-production
     depends_on:
       - db
+      - setup
     restart: unless-stopped
+
+  setup:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "sleep 10 &&
+             python manage.py makemigrations users customers loans interactions core &&
+             python manage.py migrate &&
+             python check_db.py &&
+             python create_superuser.py &&
+             python test_flow.py"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgresql://repaysync:repaysync098@db:5432/repaysync
+      - SECRET_KEY=django-insecure-dev-only-key-replace-in-production
+    depends_on:
+      - db
+    restart: "no"
 
   db:
     image: postgres:17-alpine
