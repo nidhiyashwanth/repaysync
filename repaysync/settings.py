@@ -31,7 +31,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-&8_d3fdx%^s3ox*e(y)j&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'http://20.197.19.36:8000/', 'repaysync.codeindia.tech']
 
 
 # Application definition
@@ -227,12 +227,16 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://20.197.19.36:8000',
+    'https://repaysync.codeindia.tech',
 ]
 
 # Debug toolbar settings
 INTERNAL_IPS = [
     '127.0.0.1',
     'localhost',
+    '20.197.19.36',
+    'repaysync.codeindia.tech',
 ]
 
 # Logging configuration
