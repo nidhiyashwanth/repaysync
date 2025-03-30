@@ -1,131 +1,141 @@
-# RepaySync - Loan Management System
+# RepaySync
 
-RepaySync is a comprehensive loan collection management system that helps financial institutions and lenders manage their loan portfolios, track repayments, and streamline the collection process. Built with Django, Django REST Framework, and PostgreSQL, it provides a robust API for serving both web and mobile applications.
+RepaySync is a Django-based system that centralizes customer interaction tracking between field collection teams and central calling teams for lending companies.
 
-## Features
+## Key Features
 
-- **Role-Based Access Control:** Four distinct user roles (Super Manager, Manager, Collection Officer, Calling Agent) with appropriate permissions
-- **Customer Management:** Track customer details, contact information, and loan history
-- **Loan Management:** Create and manage loan applications, approvals, and repayments
-- **Payment Tracking:** Record and monitor loan repayments
-- **Interaction Logging:** Document all customer interactions (calls, meetings, emails, etc.)
-- **Follow-Up Management:** Schedule and track follow-up actions
-- **API-First Design:** RESTful API endpoints for all functionality
-- **JWT Authentication:** Secure authentication with JSON Web Tokens
-- **Documentation:** Comprehensive API documentation with Swagger
+- **Hierarchical Role-Based Access Control**:
+
+  - Super Managers: Full system access
+  - Managers: Access to officers reporting to them (tree structure)
+  - Collection Officers: Access to assigned customers only
+  - Calling Agents: View all customers, add interactions
+
+- **Customer Management**:
+
+  - Customer profiles with branch and EMI paid status
+  - Officer assignment
+  - History of all interactions
+
+- **Loan Processing**:
+
+  - Create and manage loans
+  - Loan approval workflow
+  - Payment tracking
+  - Loan restructuring and write-offs
+
+- **Interactions**:
+  - Record customer interactions (calls, visits)
+  - Immutable history (interactions cannot be edited once created)
+  - Schedule and track follow-ups
 
 ## Technology Stack
 
-- **Backend:** Django 5.1, Django REST Framework 3.15
-- **Database:** PostgreSQL
-- **Authentication:** JWT using djangorestframework-simplejwt
-- **API Documentation:** drf-yasg (Swagger/OpenAPI)
-- **Development Tools:** Django Debug Toolbar
-- **Containerization:** Docker, Docker Compose
+- Backend: Django 5.1 with Django REST Framework
+- Database: PostgreSQL
+- Authentication: JWT
+- Containerization: Docker and Docker Compose
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.11+
-- PostgreSQL
-- Docker and Docker Compose (optional)
+- Docker and Docker Compose
+- Git
 
-### Installation
+### Installation with Docker
 
 1. Clone the repository:
 
-   ```
-   git clone https://github.com/yourusername/repaysync.git
-   cd repaysync
+   ```bash
+   git clone https://github.com/yourusername/RepaySync.git
+   cd RepaySync
    ```
 
-2. Create a virtual environment and activate it:
+2. Start the application with Docker Compose:
 
+   ```bash
+   docker-compose up -d
    ```
+
+3. Create a superuser:
+
+   ```bash
+   docker-compose exec web python manage.py createsuperuser
+   ```
+
+4. Access the application:
+   - Admin interface: http://localhost:8000/admin/
+   - API documentation: http://localhost:8000/api/docs/
+
+### Local Development Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/RepaySync.git
+   cd RepaySync
+   ```
+
+2. Create and activate a virtual environment:
+
+   ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/Scripts/activate  # Windows
+   # source venv/bin/activate    # Linux/Mac
    ```
 
 3. Install dependencies:
 
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
 
-4. Create a `.env` file with the following content (adjust as needed):
+4. Configure the environment variables (see `.env.example`).
 
-   ```
-   DEBUG=True
-   SECRET_KEY=your-secret-key-here
-   ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+5. Run migrations:
 
-   DB_ENGINE=django.db.backends.postgresql
-   DB_NAME=repaysync
-   DB_USER=repaysync
-   DB_PASSWORD=repaysync098
-   DB_HOST=localhost
-   DB_PORT=5432
+   ```bash
+   python manage.py migrate
    ```
 
-5. Set up the database:
-   ```
-   python manage.py setup_db
-   ```
+6. Create a superuser:
 
-### Running with Docker
-
-1. Build and start the Docker containers:
-
-   ```
-   docker-compose up -d
+   ```bash
+   python manage.py createsuperuser
    ```
 
-2. Access the application at http://localhost:8000
-
-### Running Locally
-
-1. Run the development server:
-
-   ```
+7. Start the development server:
+   ```bash
    python manage.py runserver
    ```
 
-2. Access the application at http://localhost:8000
+## Usage
+
+See the detailed walkthrough in [walkthrough.md](walkthrough.md) for step-by-step instructions on how to use the system.
 
 ## API Documentation
 
-The API documentation is available at:
+- API endpoints are documented using Swagger and available at `/api/docs/`
+- Authentication is handled via JWT tokens
 
-- Swagger UI: `/api/docs/`
-- ReDoc: `/api/redoc/`
+## Implementation Notes
 
-## Default Users
+- Customer interactions are immutable records (cannot be edited/deleted once created)
+- Hierarchical access is implemented as a tree structure where managers can see customers of officers reporting to them
+- Customer EMI paid status can be updated by both field collection team and calling team
 
-The system comes with the following default users for testing purposes:
+## Testing
 
-- **Super Manager**:
+Run tests with pytest:
 
-  - Username: `admin`
-  - Password: `password`
-
-- **Manager**:
-
-  - Username: `manager1`
-  - Password: `password`
-
-- **Collection Officer**:
-
-  - Username: `officer1`
-  - Password: `password`
-
-- **Calling Agent**:
-  - Username: `agent1`
-  - Password: `password`
+```bash
+pytest
+```
 
 ## License
 
-This project is proprietary.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Author
 
