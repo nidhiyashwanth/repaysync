@@ -156,9 +156,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all().order_by('last_name', 'first_name')
     serializer_class = CustomerSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['gender', 'city', 'state', 'country', 'is_active', 'assigned_officer']
-    search_fields = ['first_name', 'last_name', 'primary_phone', 'email', 'national_id', 'address']
-    ordering_fields = ['last_name', 'first_name', 'created_at', 'updated_at']
+    filterset_fields = ['gender', 'city', 'state', 'country', 'branch', 'paid_status', 'is_active', 'assigned_officer']
+    search_fields = ['first_name', 'last_name', 'primary_phone', 'email', 'national_id', 'address', 'branch']
+    ordering_fields = ['last_name', 'first_name', 'created_at', 'updated_at', 'paid_status']
     
     def get_permissions(self):
         """
@@ -185,18 +185,26 @@ class CustomerViewSet(viewsets.ModelViewSet):
         if 'test' in self.request.META.get('SERVER_NAME', '').lower():
             return queryset
             
-        # Super Managers and Managers can see all customers
-        if self.request.user.role in [User.Role.SUPER_MANAGER, User.Role.MANAGER]:
+        # Super Managers can see all customers
+        if self.request.user.role == User.Role.SUPER_MANAGER:
             return queryset
+        
+        # Managers can see customers of officers who report to them (directly or indirectly)
+        if self.request.user.role == User.Role.MANAGER:
+            # Get all collection officers under this manager
+            subordinate_ids = Hierarchy.objects.filter(
+                manager=self.request.user
+            ).values_list('collection_officer_id', flat=True)
+            
+            # Return customers assigned to any of these officers
+            return queryset.filter(assigned_officer_id__in=subordinate_ids)
         
         # Collection Officers can only see their assigned customers
         if self.request.user.role == User.Role.COLLECTION_OFFICER:
             return queryset.filter(assigned_officer=self.request.user)
         
-        # Calling Agents can see customers assigned to them for specific tasks
-        # This would require a more complex implementation in a real system
+        # Calling Agents can see all active customers
         if self.request.user.role == User.Role.CALLING_AGENT:
-            # For this example, we'll assume calling agents can see active customers
             return queryset.filter(is_active=True)
         
         return queryset.none()
@@ -422,8 +430,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class InteractionViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Interaction management.
-    All authenticated users can create interactions, but access to view/edit
-    is controlled by InteractionAndFollowUpPermission.
+    All authenticated users can create interactions, but interactions cannot be updated or deleted.
+    Access to view is controlled by InteractionAndFollowUpPermission.
     """
     queryset = Interaction.objects.all().order_by('-start_time')
     serializer_class = InteractionSerializer
@@ -431,6 +439,7 @@ class InteractionViewSet(viewsets.ModelViewSet):
     filterset_fields = ['customer', 'loan', 'interaction_type', 'outcome', 'initiated_by']
     search_fields = ['notes', 'customer__first_name', 'customer__last_name', 'contact_person']
     ordering_fields = ['start_time', 'created_at']
+    http_method_names = ['get', 'post', 'head', 'options']  # Exclude put, patch, delete
     
     def get_permissions(self):
         """

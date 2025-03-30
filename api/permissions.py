@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from users.models import User
+from users.models import User, Hierarchy
 
 
 class IsSuperManager(permissions.BasePermission):
@@ -62,7 +62,8 @@ class IsCallingAgentOrAbove(permissions.BasePermission):
 class CustomerAccessPermission(permissions.BasePermission):
     """
     Permission class for Customer model:
-    - Super Managers and Managers can access all customers
+    - Super Managers can access all customers
+    - Managers can access customers of officers directly or indirectly reporting to them 
     - Collection Officers can access only their assigned customers
     - Calling Agents have read-only access to customers
     """
@@ -71,9 +72,21 @@ class CustomerAccessPermission(permissions.BasePermission):
         return bool(request.user and request.user.is_authenticated)
     
     def has_object_permission(self, request, view, obj):
-        # Super Managers and Managers have full access
-        if request.user.role in [User.Role.SUPER_MANAGER, User.Role.MANAGER]:
+        # Super Managers have full access
+        if request.user.role == User.Role.SUPER_MANAGER:
             return True
+        
+        # Managers can access customers of officers who report to them (directly or indirectly)
+        if request.user.role == User.Role.MANAGER:
+            # Check if the customer's assigned officer reports to this manager
+            if obj.assigned_officer:
+                # Get all collection officers under this manager
+                subordinate_ids = Hierarchy.objects.filter(
+                    manager=request.user
+                ).values_list('collection_officer_id', flat=True)
+                
+                return obj.assigned_officer.id in subordinate_ids
+            return False
         
         # Collection Officers can only access their assigned customers
         if request.user.role == User.Role.COLLECTION_OFFICER:

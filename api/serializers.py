@@ -85,9 +85,9 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = ('id', 'first_name', 'last_name', 'gender', 'gender_display',
                   'date_of_birth', 'national_id', 'primary_phone', 'secondary_phone',
-                  'email', 'address', 'city', 'state', 'postal_code', 'country',
+                  'email', 'address', 'city', 'state', 'postal_code', 'country', 'branch',
                   'employer', 'job_title', 'monthly_income', 'assigned_officer',
-                  'assigned_officer_name', 'is_active', 'notes', 'risk_score',
+                  'assigned_officer_name', 'is_active', 'paid_status', 'notes', 'risk_score',
                   'created_at', 'updated_at', 'created_by', 'updated_by')
         read_only_fields = ('id', 'created_at', 'updated_at', 'created_by', 'updated_by')
     

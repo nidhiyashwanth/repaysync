@@ -18,7 +18,7 @@ class LoanAdmin(admin.ModelAdmin):
     list_filter = ('status', 'application_date', 'assigned_officer', 'payment_frequency')
     search_fields = ('loan_reference', 'customer__first_name', 'customer__last_name', 
                     'customer__primary_phone', 'notes')
-    readonly_fields = ('loan_reference', 'amount_paid', 'last_payment_date', 
+    readonly_fields = ('loan_reference', 'application_date', 'amount_paid', 'last_payment_date', 
                        'created_at', 'updated_at', 'created_by', 'updated_by')
     fieldsets = (
         ('Basic Information', {
@@ -28,14 +28,13 @@ class LoanAdmin(admin.ModelAdmin):
             'fields': (('principal_amount', 'interest_rate'), ('term_months', 'payment_frequency'))
         }),
         ('Dates', {
-            'fields': (('application_date', 'approval_date'), 
-                      ('disbursement_date', 'first_payment_date', 'maturity_date'))
+            'fields': ('approval_date', 'disbursement_date', 'first_payment_date', 'maturity_date')
         }),
         ('Payment Status', {
             'fields': (('amount_paid', 'last_payment_date'), 'days_past_due', 'notes')
         }),
         ('Metadata', {
-            'fields': ('created_at', 'updated_at', 'created_by', 'updated_by'),
+            'fields': ('application_date', 'created_at', 'updated_at', 'created_by', 'updated_by'),
             'classes': ('collapse',)
         }),
     )

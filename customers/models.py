@@ -49,6 +49,7 @@ class Customer(models.Model):
     state = models.CharField(_('state/province'), max_length=100, blank=True)
     postal_code = models.CharField(_('postal code'), max_length=20, blank=True)
     country = models.CharField(_('country'), max_length=100, blank=True)
+    branch = models.CharField(_('branch'), max_length=100, blank=True)
     
     # Employment Information
     employer = models.CharField(_('employer'), max_length=255, blank=True)
@@ -73,6 +74,7 @@ class Customer(models.Model):
     
     # Metadata
     is_active = models.BooleanField(_('active'), default=True)
+    paid_status = models.BooleanField(_('paid status'), default=False, help_text=_('Whether the customer has paid their EMI'))
     notes = models.TextField(_('notes'), blank=True)
     risk_score = models.IntegerField(_('risk score'), null=True, blank=True)
     
