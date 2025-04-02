@@ -171,7 +171,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
             
         # Only apply additional permission for non-test environments    
         if 'test' not in self.request.META.get('SERVER_NAME', '').lower():
-            permission_classes += [CustomerAccessPermission()]
+               permission_classes = [CustomerAccessPermission]
             
         return [permission() for permission in permission_classes]
     
@@ -262,7 +262,7 @@ class LoanViewSet(viewsets.ModelViewSet):
         
         # Only apply additional permission for non-test environments
         if 'test' not in self.request.META.get('SERVER_NAME', '').lower():
-            permission_classes += [LoanAccessPermission()]
+            permission_classes = [LoanAccessPermission]
             
         return [permission() for permission in permission_classes]
     
