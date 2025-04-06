@@ -9,6 +9,7 @@ from .views import (
     PaymentViewSet,
     InteractionViewSet,
     FollowUpViewSet,
+    DummyEntityViewSet,
 )
 
 # Create a router and register our viewsets with it
@@ -20,6 +21,7 @@ router.register(r'loans', LoanViewSet, basename='loan')
 router.register(r'payments', PaymentViewSet, basename='payment')
 router.register(r'interactions', InteractionViewSet, basename='interaction')
 router.register(r'follow-ups', FollowUpViewSet, basename='follow-up')
+router.register(r'dummy-entities', DummyEntityViewSet, basename='dummy-entity')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [

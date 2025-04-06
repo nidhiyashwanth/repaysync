@@ -4,11 +4,13 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from users.models import User, Hierarchy
 from customers.models import Customer
 from loans.models import Loan, Payment
 from interactions.models import Interaction, FollowUp
+from dummy_app.models import DummyEntity
 
 from .serializers import (
     UserSerializer,
@@ -18,6 +20,7 @@ from .serializers import (
     PaymentSerializer,
     InteractionSerializer,
     FollowUpSerializer,
+    DummyEntitySerializer,
 )
 
 from .permissions import (
@@ -28,7 +31,10 @@ from .permissions import (
     CustomerAccessPermission,
     LoanAccessPermission,
     InteractionAndFollowUpPermission,
+    IsOwnerOrReadOnly,
 )
+
+from core.utils import DynamicPermission, check_role_permission
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -630,4 +636,118 @@ class FollowUpViewSet(viewsets.ModelViewSet):
         follow_up.save()
         
         serializer = self.get_serializer(follow_up)
+        return Response(serializer.data)
+
+
+class DummyEntityViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the DummyEntity model demonstrating dynamic role-based permissions.
+    
+    This viewset uses the DynamicPermission class to control access to DummyEntity objects
+    based on the user's role and relationship to the entity (owner or assignee).
+    """
+    queryset = DummyEntity.objects.all()
+    serializer_class = DummyEntitySerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['is_sensitive', 'owner', 'assignee']
+    search_fields = ['name', 'description']
+    ordering_fields = ['name', 'created_at']
+    ordering = ['-created_at']
+    
+    def get_permissions(self):
+        """
+        Define dynamic permissions for different actions:
+        - List/retrieve: Any authenticated user
+        - Create: Any authenticated user
+        - Update/partial_update: Super managers, the owner, or the assignee
+        - Delete: Super managers or the owner
+        """
+        if self.action in ['update', 'partial_update']:
+            # For updates, allow super managers, owners, and assignees
+            permission_classes = [
+                DynamicPermission(
+                    required_roles=[User.Role.SUPER_MANAGER, User.Role.MANAGER],
+                    owner_field='owner',
+                    assignee_field='assignee'
+                )
+            ]
+        elif self.action == 'destroy':
+            # For deletion, only allow super managers and owners
+            permission_classes = [
+                DynamicPermission(
+                    required_roles=[User.Role.SUPER_MANAGER],
+                    owner_field='owner'
+                )
+            ]
+        else:
+            # For list, retrieve, create
+            permission_classes = [permissions.IsAuthenticated]
+        
+        return [permission() for permission in permission_classes]
+    
+    def get_queryset(self):
+        """
+        Filter queryset based on user role:
+        - Super Managers see all entities
+        - Managers see their own and entities assigned to their reports
+        - Others see only their own entities or ones they're assigned to
+        """
+        user = self.request.user
+        queryset = super().get_queryset()
+        
+        # Super Managers can see all entities
+        if user.role == User.Role.SUPER_MANAGER:
+            return queryset
+        
+        # Managers can see their own entities, and entities assigned to their reports
+        if user.role == User.Role.MANAGER:
+            subordinate_ids = Hierarchy.objects.filter(
+                manager=user
+            ).values_list('collection_officer_id', flat=True)
+            
+            return queryset.filter(
+                Q(owner=user) | 
+                Q(assignee=user) | 
+                Q(assignee__in=subordinate_ids)
+            )
+        
+        # All other roles can only see their own entities or ones they're assigned to
+        return queryset.filter(
+            Q(owner=user) | 
+            Q(assignee=user)
+        )
+    
+    @action(detail=True, methods=['post'])
+    @check_role_permission(
+        required_roles=[User.Role.SUPER_MANAGER, User.Role.MANAGER],
+        owner_field='owner',
+        assignee_field='assignee'
+    )
+    def mark_sensitive(self, request, pk=None):
+        """
+        Mark an entity as sensitive.
+        Only super managers, managers, owners, or assignees can do this.
+        """
+        entity = self.get_object()
+        entity.is_sensitive = True
+        entity.save()
+        
+        serializer = self.get_serializer(entity)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    @check_role_permission(
+        required_roles=[User.Role.SUPER_MANAGER],
+        owner_field='owner'
+    )
+    def mark_not_sensitive(self, request, pk=None):
+        """
+        Mark an entity as not sensitive.
+        Only super managers or owners can do this.
+        """
+        entity = self.get_object()
+        entity.is_sensitive = False
+        entity.save()
+        
+        serializer = self.get_serializer(entity)
         return Response(serializer.data) 

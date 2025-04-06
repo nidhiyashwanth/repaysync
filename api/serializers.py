@@ -7,6 +7,7 @@ from users.models import User, Hierarchy
 from customers.models import Customer
 from loans.models import Loan, Payment
 from interactions.models import Interaction, FollowUp
+from dummy_app.models import DummyEntity
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -271,4 +272,32 @@ class FollowUpSerializer(serializers.ModelSerializer):
             if request and hasattr(request, 'user'):
                 validated_data['completed_by'] = request.user
         
-        return super().update(instance, validated_data) 
+        return super().update(instance, validated_data)
+
+
+class DummyEntitySerializer(serializers.ModelSerializer):
+    """Serializer for the DummyEntity model"""
+    
+    owner_name = serializers.SerializerMethodField()
+    assignee_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = DummyEntity
+        fields = ('id', 'name', 'description', 'owner', 'owner_name', 
+                  'assignee', 'assignee_name', 'is_sensitive',
+                  'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at')
+    
+    def get_owner_name(self, obj):
+        return obj.owner.get_full_name()
+    
+    def get_assignee_name(self, obj):
+        if obj.assignee:
+            return obj.assignee.get_full_name()
+        return None
+    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and 'owner' not in validated_data:
+            validated_data['owner'] = request.user
+        return super().create(validated_data) 

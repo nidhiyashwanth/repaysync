@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'loans',
     'api',
     'core',
+    'dummy_app',  # Added dummy app for testing dynamic permissions
 ]
 
 MIDDLEWARE = [
